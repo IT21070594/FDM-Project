@@ -1,28 +1,29 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
+# In[10]:
 
 
 #pip install streamlit
 
 
-# In[2]:
+# In[11]:
 
 
 #pip install joblib
 
 
-# In[3]:
+# In[31]:
 
 
 import streamlit as st
-import joblib  # Import joblib to load the model
+import joblib
 import pandas as pd
+import category_encoders as ce
 
 # Load the pre-trained model
-#model = joblib.load("random_forest_model.pkl")  # Replace with the actual filename
-
+model = joblib.load("random_forest_model.pkl")  # Replace with the actual filename
+print(model)
 
 
 # Define the background image CSS with a relative path
@@ -38,18 +39,16 @@ body {
 
 # Set the app title and background
 st.set_page_config(page_title="Credit Card Fraud Detection App", page_icon="🔒")
-
 # Apply the background using st.markdown
 st.markdown(background, unsafe_allow_html=True)
+
 # Streamlit app content
 st.title("Credit Card Fraud Detection App")
 
-
-
-
+dataset=pd.read_csv("Dataset/credit_card_subset.csv")
 # Load your dataset using Pandas (replace 'your_data.csv' with your actual file)
-dataset = pd.read_csv("Dataset/credit_card_subset.csv")
-
+preprocessed_dataset = pd.read_csv("cleaned_dataset.csv")
+filtered_dataset = pd.read_csv("filtered_dataset.csv")
 # Extract a specific column from the dataset for the dropdown
 column_name = 'merchant'  # Replace with the name of the column you want to use
 data_values_merchant = dataset[column_name].unique()
@@ -74,8 +73,6 @@ data_values_job = dataset[column_name].unique()
 job = st.selectbox("Job", data_values_job)
 st.write("You selected:", job)
 
-
-
 # Extract a specific column from the dataset for the dropdown
 column_name = 'state'  # Replace with the name of the column you want to use
 data_values_state = dataset[column_name].unique()
@@ -92,17 +89,39 @@ data_values_city = dataset[column_name].unique()
 city = st.selectbox("City", data_values_city)
 st.write("You selected:", city)
 
-
 age = st.number_input("Age", min_value=0, max_value=120, value=30, placeholder="Type an age...")
 st.write('The current age is ', age)
 
 amount = st.number_input('Amount')
 st.write('The current amount is ', amount)
 
+# Capture user inputs
+user_input = {
+    'city': city,
+    'state': state,
+    'job': job,
+    'merchant': merchant,
+    'category': category,
+    'amount': amount,
+    'age': age,
+}
+# Create a DataFrame with user input
+user_data = pd.DataFrame([user_input])
+
+# Create a binary encoder for categorical columns
+categorical_columns = ['city', 'state', 'job', 'merchant', 'category']  # Update with columns from your preprocessed dataset
+encoder = ce.BinaryEncoder(cols=categorical_columns)
+
+# Fit the encoder on your training data (assuming 'filtered' is your training dataset)
+# Assuming you already have your 'filtered' DataFrame with your training data
+encoder.fit(filtered_dataset)
+# Apply the same encoder to the user input
+user_data_encoded = encoder.transform(user_data)
+
 # Make predictions using the loaded model
 if st.button("Predict"):
-    input_data = [user_input]  # Prepare the input data based on your model's requirements
-    prediction = model.predict(input_data)
+     # Prepare the input data based on your model's requirements
+    prediction = model.predict(user_data_encoded)
     st.write("Prediction:", prediction[0])
 
 
