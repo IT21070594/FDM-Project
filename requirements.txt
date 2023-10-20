@@ -1,4 +1,4 @@
-import joblib
-import category_encoders as ce
+joblib
+category_encoders
 
 st.write('Hi')
