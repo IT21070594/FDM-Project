@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[18]:
+# In[22]:
 
 
 import streamlit as st
@@ -11,6 +11,10 @@ import category_encoders as ce
 
 # Set the app title and background
 st.set_page_config(page_title="Credit Guard Pro", page_icon="🔒")
+
+# Define the background image within a div and set it to cover the entire page
+# Define the HTML structure and CSS for your app
+
 
 # Load the pre-trained model
 model = joblib.load("random_forest_model.pkl")  # Replace with the actual filename
