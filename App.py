@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[22]:
+# In[1]:
 
 
 import streamlit as st
@@ -28,11 +28,11 @@ training_dataset = pd.read_csv("filtered_dataset.csv")
 
 # Streamlit App
 def main():
-    st.subheader("CreditGuard Pro is your go-to solution for safeguarding your credit card transactions. Our advanced model is designed to meticulously spot potential fraud, ensuring your financial peace of mind. Simply input transaction details, and CreditGuard Pro will provide you with an instant prediction: Fraudulent or Legitimate.")
-    st.subheader("Embrace financial security like never before, with the power of AI in your pocket. Trust CreditGuard Pro to keep your transactions secure and your finances in check!")
+    st.write("CreditGuard Pro is your go-to solution for safeguarding your credit card transactions. Our advanced model is designed to meticulously spot potential fraud, ensuring your financial peace of mind. Simply input transaction details, and CreditGuard Pro will provide you with an instant prediction: Fraudulent or Legitimate.")
+    st.write("Embrace financial security like never before, with the power of AI in your pocket. Trust CreditGuard Pro to keep your transactions secure and your finances in check!")
     st.divider()
     st.write(':blue[_📝 Fill in the Details: Click the left sidebar to enter the required information._]')
-    st.divider()
+    #st.divider()
     st.write("_🔍 Predict Fraud Status: To reveal the prediction for the transaction's fraud status, click the button below :red[after you've provided the necessary information.]_")
 
     # Sidebar with user inputs
@@ -92,8 +92,10 @@ def main():
 
         if prediction[0] == 0:
             st.success('This transaction entered is NON-FRAUDULENT! ✅')
+            st.write('Model Accuracy : 99.5%')
         elif prediction[0] == 1:
             st.error('This transaction entered is FRAUDULENT! 🚨')
+            st.write('Model Accuracy : 99.5%')
         else:
             st.warning('Unknown Prediction! ⚠️')
 
