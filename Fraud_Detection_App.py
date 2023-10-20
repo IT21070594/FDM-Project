@@ -13,7 +13,11 @@
 #pip install joblib
 
 
+<<<<<<< Updated upstream
 # In[4]:
+=======
+# In[24]:
+>>>>>>> Stashed changes
 
 
 import streamlit as st
@@ -46,9 +50,11 @@ st.markdown(background, unsafe_allow_html=True)
 st.title("Credit Card Fraud Detection App")
 
 dataset=pd.read_csv("Dataset/credit_card_subset.csv")
+training_dataset=pd.read_csv("filtered_dataset.csv")
 # Load your dataset using Pandas (replace 'your_data.csv' with your actual file)
-preprocessed_dataset = pd.read_csv("cleaned_dataset.csv")
-filtered_dataset = pd.read_csv("filtered_dataset.csv")
+#preprocessed_dataset = pd.read_csv("cleaned_dataset.csv")
+#filtered_dataset= pd.read_csv("cleaned_dataset_with_feature_cols_only.csv")
+
 # Extract a specific column from the dataset for the dropdown
 column_name = 'merchant'  # Replace with the name of the column you want to use
 data_values_merchant = dataset[column_name].unique()
@@ -94,35 +100,35 @@ st.write('The current age is ', age)
 
 amount = st.number_input('Amount')
 st.write('The current amount is ', amount)
-
-# Capture user inputs
 user_input = {
-    'city': city,
-    'state': state,
-    'job': job,
     'merchant': merchant,
     'category': category,
-    'amount': amount,
+     'job': job,
     'age': age,
+    'state': state,
+    'city': city,  
+    'amount': amount,
+    
 }
-# Create a DataFrame with user input
 user_data = pd.DataFrame([user_input])
-
-# Create a binary encoder for categorical columns
-categorical_columns = ['city', 'state', 'job', 'merchant', 'category']  # Update with columns from your preprocessed dataset
+categorical_columns = [ 'merchant', 'category', 'job', 'state','city']
 encoder = ce.BinaryEncoder(cols=categorical_columns)
-
-# Fit the encoder on your training data (assuming 'filtered' is your training dataset)
-# Assuming you already have your 'filtered' DataFrame with your training data
-encoder.fit(filtered_dataset)
-# Apply the same encoder to the user input
-user_data_encoded = encoder.transform(user_data)
+encoder.fit(training_dataset)
+encoded_data = encoder.transform(user_data)
+# Create a DataFrame with user input
 
 # Make predictions using the loaded model
 if st.button("Predict"):
      # Prepare the input data based on your model's requirements
-    prediction = model.predict(user_data_encoded)
-    st.write("Prediction:", prediction[0])
+    prediction = model.predict(encoded_data)
+    
+    if prediction[0] == 0:
+        st.write("Prediction: Not Fraudulent")
+    elif prediction[0] == 1:
+        st.write("Prediction: Fraudulent")
+    else:
+        st.write("Unknown Prediction")
+   
 
 
 # In[ ]:
