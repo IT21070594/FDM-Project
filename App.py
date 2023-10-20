@@ -1,115 +1,104 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
+# In[18]:
 
 
 import streamlit as st
-import joblib
 import pandas as pd
+import joblib
 import category_encoders as ce
+
+# Set the app title and background
+st.set_page_config(page_title="Credit Guard Pro", page_icon="🔒")
 
 # Load the pre-trained model
 model = joblib.load("random_forest_model.pkl")  # Replace with the actual filename
 print(model)
 
-
-# Define the background image CSS with a relative path
-background = """
-<style>
-body {
-    background-image: url("https://d1m75rqqgidzqn.cloudfront.net/wp-data/2021/09/22153728/iStock-1203763961.jpg");
-    background-size: cover;
-    background-attachment: fixed;
-}
-</style>
-"""
-
-# Set the app title and background
-st.set_page_config(page_title="Credit Card Fraud Detection App", page_icon="🔒")
-# Apply the background using st.markdown
-st.markdown(background, unsafe_allow_html=True)
-
 # Streamlit app content
-st.title("Credit Card Fraud Detection App")
+st.title("Credit Guard Pro 🔐")
 
-dataset=pd.read_csv("Dataset/credit_card_subset.csv")
-training_dataset=pd.read_csv("filtered_dataset.csv")
-# Load your dataset using Pandas (replace 'your_data.csv' with your actual file)
-#preprocessed_dataset = pd.read_csv("cleaned_dataset.csv")
-#filtered_dataset= pd.read_csv("cleaned_dataset_with_feature_cols_only.csv")
+dataset = pd.read_csv("Dataset/credit_card_subset.csv")
+training_dataset = pd.read_csv("filtered_dataset.csv")
 
-# Extract a specific column from the dataset for the dropdown
-column_name = 'merchant'  # Replace with the name of the column you want to use
-data_values_merchant = dataset[column_name].unique()
+# Streamlit App
+def main():
+    st.subheader("CreditGuard Pro is your go-to solution for safeguarding your credit card transactions. Our advanced model is designed to meticulously spot potential fraud, ensuring your financial peace of mind. Simply input transaction details, and CreditGuard Pro will provide you with an instant prediction: Fraudulent or Legitimate.")
+    st.subheader("Embrace financial security like never before, with the power of AI in your pocket. Trust CreditGuard Pro to keep your transactions secure and your finances in check!")
+    st.divider()
+    st.write(':blue[_📝 Fill in the Details: Click the left sidebar to enter the required information._]')
+    st.divider()
+    st.write("_🔍 Predict Fraud Status: To reveal the prediction for the transaction's fraud status, click the button below :red[after you've provided the necessary information.]_")
 
-# Create a dropdown using st.selectbox
-merchant = st.selectbox("Merchant", data_values_merchant)
-st.write("You selected:", merchant)
+    # Sidebar with user inputs
+    st.sidebar.header("Enter The Transaction Details", divider="violet")
 
-# Extract a specific column from the dataset for the dropdown
-column_name = 'category'  # Replace with the name of the column you want to use
-data_values_category = dataset[column_name].unique()
+    # Extract a specific column from the dataset for the dropdown
+    column_name = 'merchant'  # Replace with the name of the column you want to use
+    data_values_merchant = dataset[column_name].unique()
 
-# Create a dropdown using st.selectbox
-category = st.selectbox("Category", data_values_category)
-st.write("You selected:", category)
+    column_name = 'category'  # Replace with the name of the column you want to use
+    data_values_category = dataset[column_name].unique()
 
-# Extract a specific column from the dataset for the dropdown
-column_name = 'job'  # Replace with the name of the column you want to use
-data_values_job = dataset[column_name].unique()
+    column_name = 'job'  # Replace with the name of the column you want to use
+    data_values_job = dataset[column_name].unique()
 
-# Create a dropdown using st.selectbox
-job = st.selectbox("Job", data_values_job)
-st.write("You selected:", job)
+    column_name = 'state'  # Replace with the name of the column you want to use
+    data_values_state = dataset[column_name].unique()
 
-# Extract a specific column from the dataset for the dropdown
-column_name = 'state'  # Replace with the name of the column you want to use
-data_values_state = dataset[column_name].unique()
+    column_name = 'city'  # Replace with the name of the column you want to use
+    data_values_city = dataset[column_name].unique()
 
-# Create a dropdown using st.selectbox
-state = st.selectbox("State", data_values_state)
-st.write("You selected:", state)
+    # Collect user input
+    def user_input_features():
+        merchant = st.sidebar.selectbox('Merchant', data_values_merchant)
+        category = st.sidebar.selectbox('Category', data_values_category)
+        job = st.sidebar.selectbox('Job', data_values_job)
+        state = st.sidebar.selectbox('State', data_values_state)
+        city = st.sidebar.selectbox('City', data_values_city)
+        age = st.sidebar.number_input('Age', min_value=0, max_value=120, value=30, placeholder="Type an age...")
+        amount = st.sidebar.number_input('Amount', min_value=0.0, placeholder="Type the amount...")
 
-# Extract a specific column from the dataset for the dropdown
-column_name = 'city'  # Replace with the name of the column you want to use
-data_values_city = dataset[column_name].unique()
+        # Create a dictionary for user input
+        user_input = {
+            'merchant': merchant,
+            'category': category,
+            'job': job,
+            'age': age,
+            'state': state,
+            'city': city,
+            'amount': amount,
+        }
 
-# Create a dropdown using st.selectbox
-city = st.selectbox("City", data_values_city)
-st.write("You selected:", city)
+        return user_input
 
-age = st.number_input("Age", min_value=0, max_value=120, value=30, placeholder="Type an age...")
-st.write('The current age is ', age)
+    user_input = user_input_features()  # Call the function to get user input
 
-amount = st.number_input('Amount')
-st.write('The current amount is ', amount)
-user_input = {
-    'merchant': merchant,
-    'category': category,
-     'job': job,
-    'age': age,
-    'state': state,
-    'city': city,  
-    'amount': amount,
-    
-}
-user_data = pd.DataFrame([user_input])
-categorical_columns = [ 'merchant', 'category', 'job', 'state','city']
-encoder = ce.BinaryEncoder(cols=categorical_columns)
-encoder.fit(training_dataset)
-encoded_data = encoder.transform(user_data)
-# Create a DataFrame with user input
+    user_data = pd.DataFrame([user_input])
+    categorical_columns = ['merchant', 'category', 'job', 'state', 'city']
+    encoder = ce.BinaryEncoder(cols=categorical_columns)
+    encoder.fit(training_dataset)
+    encoded_data = encoder.transform(user_data)
 
-# Make predictions using the loaded model
-if st.button("Predict"):
-     # Prepare the input data based on your model's requirements
-    prediction = model.predict(encoded_data)
-    
-    if prediction[0] == 0:
-        st.write("The transaction entered is NON-FRAUDULENT")
-    elif prediction[0] == 1:
-        st.write("The transaction entered is FRAUDULENT")
-    else:
-        st.write("Unknown Prediction")
+    # Button to trigger predictions
+    if st.button("Predict"):
+        # Prepare the input data based on your model's requirements
+        prediction = model.predict(encoded_data)
+
+        if prediction[0] == 0:
+            st.success('This transaction entered is NON-FRAUDULENT! ✅')
+        elif prediction[0] == 1:
+            st.error('This transaction entered is FRAUDULENT! 🚨')
+        else:
+            st.warning('Unknown Prediction! ⚠️')
+
+if __name__ == '__main__':
+    main()
+
+
+# In[ ]:
+
+
+
 
